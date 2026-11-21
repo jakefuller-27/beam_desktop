@@ -49,3 +49,8 @@
 - Asked to rerun the `spec.md` validation cases after verifying the calculation sheet.
 - Reran cases 1–8 and the full automated suite.
 - Outcome: all specified numerical comparisons remained within 0.5%, case 3 failed deflection as expected, the case 7 PDF was one page, and all 16 tests passed.
+
+## 2026-11-21
+- Asked for a short README describing the app, packages, and Python start command.
+- Added `README.md` with the app summary, dependency installation command, and `python3 app.py`.
+- Outcome: documentation added.
