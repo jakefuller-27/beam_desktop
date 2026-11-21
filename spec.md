@@ -1,3 +1,8 @@
+## Platform
+- Python desktop app using Tkinter, started with `python3 app.py`
+- Calculations with numpy, kept in their own module, separate from
+  the window code
+- Diagrams drawn with matplotlib, embedded in the window
 # Beam Designer
 
 ## Purpose
@@ -156,15 +161,9 @@ sizing a floor beam or deck joist.
 - Everything updates immediately whenever any input changes.
 
 ## Look and feel
-- Opens with the initial defaults already loaded, so it is useful the
-  moment it opens.
-- Clean and professional, like a commercial engineering web app: light
-  background, white cards with soft shadows, one accent color, a modern
-  system font, generous spacing. No clutter.
-- Inputs in a panel on the left; drawing, diagrams, and checks on the
-  right. On a phone, the panels stack.
-- Every input has a short label with units. Hovering over a check card
-  explains the formula used.
+- Inputs in a panel on the left
+- The beam and diagrams on the right
+- The window can be resized
 
 ## Validation
 1. Simply supported, 20 ft, W12x26, uniform 1 kip/ft over the full span:
@@ -190,7 +189,9 @@ With self-weight off, cases 1–4 must remain unchanged.
 7. Print the default beam: the one-page calculation sheet shows the same
    results as the screen, including max moment 50.00 kip-ft, fb = 17.96
    ksi, max deflection 0.609 in, and PASS for both checks.
-
+8. Simply supported, 30 ft, W18x35, uniform 2 kips/ft from 0 to 15 ft
+   only: reactions 22.5 k (left) and 7.5 k (right); max moment
+   126.6 kip-ft at 11.25 ft.
 ## Out of scope
 - Shear stress, lateral-torsional buckling, load combinations, and
   continuous beams.
