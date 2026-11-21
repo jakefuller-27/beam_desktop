@@ -29,3 +29,13 @@
 - Asked to rerun the `spec.md` validation cases.
 - Reran all eight numerical/PDF cases and the automated test suite.
 - Outcome: all specified values remained within 0.5%; the default PDF was one page and all 14 tests passed.
+
+## 2026-11-21
+- Asked to add the Export results feature described in `spec.md`.
+- Added an Export CSV button and Excel-friendly CSV output for sampled x, V, M, and deflection values, including one-sided shear rows at load and support jumps.
+- Outcome: all 16 automated tests and the Tkinter CSV-button smoke check passed.
+
+## 2026-11-21
+- Asked to rerun the `spec.md` validation cases after adding CSV export.
+- Reran cases 1–8 directly and the full automated test suite.
+- Outcome: all specified numerical comparisons remained within 0.5%, case 3 failed deflection as expected, the case 7 PDF remained one page, and all 16 tests passed.

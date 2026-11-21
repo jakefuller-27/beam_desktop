@@ -268,3 +268,5 @@ and fit the sheet on one letter-size page.
 **Check:** Print or save the default beam as a PDF. Confirm the sheet fits
 on one page and shows max moment 50.00 kip-ft, fb = 17.96 ksi, max
 deflection 0.609 in, and PASS for both checks, matching the screen.
+## Export results
+- A button that saves a table of x, V, M, and deflection along the beam to a CSV file that opens in Excel.

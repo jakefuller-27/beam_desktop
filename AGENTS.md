@@ -12,6 +12,7 @@ build system, or alternate application framework.
   the window code.
 - `beam_design_io.py`: validated JSON Save/Open for beam input designs.
 - `beam_print.py`: one-page PDF calculation sheet generation and opening.
+- `beam_results_export.py`: Excel-friendly CSV export of sampled beam results.
 - `spec.md`: requirements and validation values.
 - `prompts.md`: request and change log.
 - `02_validation/`: hand calculations and automated validation tests.

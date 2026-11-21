@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import csv
 import subprocess
 import tkinter as tk
 from pathlib import Path
@@ -26,6 +27,7 @@ from beam_calculations import (
 )
 from beam_design_io import BeamDesign, load_design, save_design
 from beam_print import export_calculation_sheet, open_pdf
+from beam_results_export import export_results_csv
 
 
 BACKGROUND = "#edf2f6"
@@ -364,10 +366,15 @@ class BeamDesigner:
         ttk.Label(header, text="Analysis results", style="Title.TLabel").grid(
             row=0, column=0, sticky="w"
         )
-        ttk.Button(
+        self.print_button = ttk.Button(
             header, text="Print / Save PDF", style="Accent.TButton",
             command=self._print_pdf,
-        ).grid(row=0, column=1, sticky="e")
+        )
+        self.print_button.grid(row=0, column=2, sticky="e")
+        self.export_button = ttk.Button(
+            header, text="Export CSV", command=self._export_csv
+        )
+        self.export_button.grid(row=0, column=1, sticky="e", padx=(0, 8))
         self.warning_label = ttk.Label(
             self.right, textvariable=self.warning_var, foreground=WARNING
         )
@@ -1164,6 +1171,40 @@ class BeamDesigner:
                 f"The calculation sheet could not be saved or opened at:\n{path}\n\n{error}",
                 parent=self.root,
             )
+
+    def _export_csv(self) -> None:
+        if self.result is None:
+            return
+        if not self.inputs_valid:
+            messagebox.showerror(
+                "Could not export results",
+                "Correct the invalid beam inputs before exporting.",
+                parent=self.root,
+            )
+            return
+        path = filedialog.asksaveasfilename(
+            parent=self.root,
+            title="Export beam results",
+            defaultextension=".csv",
+            filetypes=(("CSV files", "*.csv"),),
+            initialfile="beam-results.csv",
+        )
+        if not path:
+            return
+        try:
+            output = export_results_csv(path, self.result)
+        except (OSError, ValueError, csv.Error) as error:
+            messagebox.showerror(
+                "Could not export results",
+                str(error),
+                parent=self.root,
+            )
+            return
+        messagebox.showinfo(
+            "Results exported",
+            f"Exported beam results to:\n{output}",
+            parent=self.root,
+        )
 
 
 def main() -> None:
