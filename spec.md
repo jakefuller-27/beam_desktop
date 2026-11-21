@@ -270,3 +270,5 @@ on one page and shows max moment 50.00 kip-ft, fb = 17.96 ksi, max
 deflection 0.609 in, and PASS for both checks, matching the screen.
 ## Export results
 - A button that saves a table of x, V, M, and deflection along the beam to a CSV file that opens in Excel.
+## Calculation sheet
+- A button that saves the diagrams and checks as a PDF, with the inputs listed at the top, ready to hand in with a design.

@@ -39,3 +39,13 @@
 - Asked to rerun the `spec.md` validation cases after adding CSV export.
 - Reran cases 1–8 directly and the full automated test suite.
 - Outcome: all specified numerical comparisons remained within 0.5%, case 3 failed deflection as expected, the case 7 PDF remained one page, and all 16 tests passed.
+
+## 2026-11-21
+- Asked to add the Calculation sheet feature described in `spec.md`.
+- Verified the existing Print / Save PDF action generates the requested sheet with inputs, diagrams, and checks.
+- Outcome: the UI export smoke check produced a one-page PDF and all 16 automated tests passed.
+
+## 2026-11-21
+- Asked to rerun the `spec.md` validation cases after verifying the calculation sheet.
+- Reran cases 1–8 and the full automated suite.
+- Outcome: all specified numerical comparisons remained within 0.5%, case 3 failed deflection as expected, the case 7 PDF was one page, and all 16 tests passed.
