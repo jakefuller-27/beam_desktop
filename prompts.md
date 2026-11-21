@@ -19,3 +19,13 @@
 - Asked to run all validation cases in `spec.md` against the beam calculations and report expected versus actual values.
 - Ran cases 1–8 directly through `beam_calculations.py` and generated the default one-page PDF for case 7.
 - Outcome: all numerical values matched within the specified 0.5% tolerance; the PDF had one page.
+
+## 2026-11-21
+- Asked to add the Save and Open feature described in `spec.md`.
+- Added a File menu with validated JSON persistence for beam settings and ordered loads, plus round-trip and invalid-file tests.
+- Outcome: all 14 automated tests and Tkinter Save/Open interaction checks passed.
+
+## 2026-11-21
+- Asked to rerun the `spec.md` validation cases.
+- Reran all eight numerical/PDF cases and the automated test suite.
+- Outcome: all specified values remained within 0.5%; the default PDF was one page and all 14 tests passed.

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import subprocess
 import tkinter as tk
+from pathlib import Path
 from tkinter import filedialog, messagebox, ttk
 
 import numpy as np
@@ -23,6 +24,7 @@ from beam_calculations import (
     analyze_beam,
     lightest_passing_section,
 )
+from beam_design_io import BeamDesign, load_design, save_design
 from beam_print import export_calculation_sheet, open_pdf
 
 
@@ -148,6 +150,7 @@ class BeamDesigner:
 
         self._syncing = False
         self._normalizing = False
+        self.inputs_valid = True
         self.load_editors: list[LoadEditor] = []
         self.span_var = tk.DoubleVar(value=20.0)
         self.span_entry_var = tk.StringVar(value="20")
@@ -171,10 +174,12 @@ class BeamDesigner:
         }
         self.result: AnalysisResult | None = None
         self.recommendation: Section | None = None
+        self.current_design_path: Path | None = None
         self.point_loads: tuple[PointLoad, ...] = ()
         self.uniform_loads: tuple[UniformLoad, ...] = ()
         self.dragged_editor: LoadEditor | None = None
 
+        self._build_file_menu()
         self._build_layout()
         self._add_load("uniform", 1.0, 0.0, 20.0)
         self.span_entry_var.trace_add("write", self._input_changed)
@@ -183,6 +188,14 @@ class BeamDesigner:
         self.deflection_var.trace_add("write", self._input_changed)
         self.self_weight_var.trace_add("write", self._input_changed)
         self._input_changed()
+
+    def _build_file_menu(self) -> None:
+        menu_bar = tk.Menu(self.root)
+        file_menu = tk.Menu(menu_bar, tearoff=False)
+        file_menu.add_command(label="Save", command=self._save_design)
+        file_menu.add_command(label="Open", command=self._open_design)
+        menu_bar.add_cascade(label="File", menu=file_menu)
+        self.root.configure(menu=menu_bar)
 
     def _build_layout(self) -> None:
         outer = ttk.Frame(self.root, padding=12)
@@ -575,6 +588,7 @@ class BeamDesigner:
                 uniforms.append(UniformLoad(magnitude, first, second))
         except ValueError:
             self._normalizing = False
+            self.inputs_valid = False
             self.warning_var.set("Enter valid numeric values for span and loads.")
             return
         finally:
@@ -610,9 +624,11 @@ class BeamDesigner:
                     include_self_weight=self.self_weight_var.get(),
                 )
         except ValueError as error:
+            self.inputs_valid = False
             self.warning_var.set(str(error))
             return
 
+        self.inputs_valid = True
         if not warnings and not self.point_loads and not self.uniform_loads:
             warnings.append("Add a load to see results.")
         self.warning_var.set("  ".join(dict.fromkeys(warnings)))
@@ -990,6 +1006,121 @@ class BeamDesigner:
         if self.recommendation is not None:
             self.section_var.set(self.recommendation.name)
             self._input_changed()
+
+    def _current_design(self) -> BeamDesign:
+        if not self.inputs_valid:
+            raise ValueError("Correct the invalid beam inputs before saving.")
+        point_loads = iter(self.point_loads)
+        uniform_loads = iter(self.uniform_loads)
+        ordered_loads = tuple(
+            next(point_loads) if editor.kind == "point" else next(uniform_loads)
+            for editor in self.load_editors
+        )
+        return BeamDesign(
+            support_type=self.support_var.get(),  # type: ignore[arg-type]
+            span_ft=float(self.span_var.get()),
+            material=self.material_var.get(),  # type: ignore[arg-type]
+            section_name=self.section_var.get(),
+            deflection_limit=self.deflection_var.get(),
+            include_self_weight=self.self_weight_var.get(),
+            loads=ordered_loads,
+        )
+
+    def _save_design(self) -> None:
+        if not self.inputs_valid:
+            messagebox.showerror(
+                "Could not save beam design",
+                "Correct the invalid beam inputs before saving.",
+                parent=self.root,
+            )
+            return
+        path = self.current_design_path
+        if path is None:
+            selected_path = filedialog.asksaveasfilename(
+                parent=self.root,
+                title="Save beam design",
+                defaultextension=".beam.json",
+                filetypes=(
+                    ("Beam design files", "*.beam.json"),
+                    ("JSON files", "*.json"),
+                ),
+                initialfile="beam-design.beam.json",
+            )
+            if not selected_path:
+                return
+            path = Path(selected_path)
+        try:
+            saved_path = save_design(path, self._current_design())
+        except (OSError, ValueError) as error:
+            messagebox.showerror(
+                "Could not save beam design",
+                str(error),
+                parent=self.root,
+            )
+            return
+        self.current_design_path = saved_path
+        messagebox.showinfo(
+            "Beam design saved",
+            f"Saved beam design to:\n{saved_path}",
+            parent=self.root,
+        )
+
+    def _open_design(self) -> None:
+        path = filedialog.askopenfilename(
+            parent=self.root,
+            title="Open beam design",
+            filetypes=(
+                ("Beam design files", "*.beam.json"),
+                ("JSON files", "*.json"),
+            ),
+        )
+        if not path:
+            return
+        try:
+            design = load_design(path)
+        except (OSError, ValueError) as error:
+            messagebox.showerror(
+                "Could not open beam design",
+                str(error),
+                parent=self.root,
+            )
+            return
+        self._apply_design(design)
+        self.current_design_path = Path(path)
+        messagebox.showinfo(
+            "Beam design opened",
+            f"Opened beam design from:\n{path}",
+            parent=self.root,
+        )
+
+    def _apply_design(self, design: BeamDesign) -> None:
+        self._syncing = True
+        self.dragged_editor = None
+        try:
+            self.span_entry_var.set(f"{design.span_ft:g}")
+            self.span_var.set(design.span_ft)
+            self.support_var.set(design.support_type)
+            self.material_var.set(design.material)
+            self._set_section_options()
+            self.section_var.set(design.section_name)
+            self.deflection_var.set(design.deflection_limit)
+            self.self_weight_var.set(design.include_self_weight)
+            for editor in self.load_editors:
+                editor.frame.destroy()
+            self.load_editors.clear()
+            for load in design.loads:
+                if isinstance(load, PointLoad):
+                    self._add_load("point", load.magnitude_kip, load.position_ft)
+                else:
+                    self._add_load(
+                        "uniform",
+                        load.magnitude_kip_ft,
+                        load.start_ft,
+                        load.end_ft,
+                    )
+        finally:
+            self._syncing = False
+        self._input_changed()
 
     def _print_pdf(self) -> None:
         if self.result is None:

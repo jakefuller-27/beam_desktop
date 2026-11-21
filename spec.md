@@ -195,7 +195,8 @@ With self-weight off, cases 1–4 must remain unchanged.
 ## Out of scope
 - Shear stress, lateral-torsional buckling, load combinations, and
   continuous beams.
-- Saving designs.
+## Save and Open
+- A File menu with Save and Open that saves the beam (support type, span, section, deflection limit, and loads) to a file and opens it again.
 
 ## Build stages:
 

@@ -10,6 +10,7 @@ build system, or alternate application framework.
   recommendations.
 - `beam_calculations.py`: NumPy-based beam calculations, kept separate from
   the window code.
+- `beam_design_io.py`: validated JSON Save/Open for beam input designs.
 - `beam_print.py`: one-page PDF calculation sheet generation and opening.
 - `spec.md`: requirements and validation values.
 - `prompts.md`: request and change log.
